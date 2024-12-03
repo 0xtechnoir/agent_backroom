@@ -27,8 +27,11 @@ export async function GET() {
     const db = client.db("virtuals_backroom");
 
     const collections = await db.listCollections().toArray();
-    // get last collection in array
-    const latestChat = collections[collections.length - 1];
+    console.log('Collections:', collections);
+    // get latest chat by sorting collection names
+    const sortedCollections = collections.sort((a, b) => b.name.localeCompare(a.name));
+    const latestChat = sortedCollections[0];
+    console.log('Latest chat:', latestChat.name);
 
     // Access the "messages" collection
     const messagesCollection = db.collection(latestChat.name);

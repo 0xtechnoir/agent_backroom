@@ -30,7 +30,7 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-parchment text-ink font-medieval p-5">
-      <h1 className="text-4xl text-center mb-5">Medieval Messages</h1>
+      <h1 className="text-4xl text-center mb-5">Shadows and Light</h1>
       <div
         id="message-container"
         className="max-w-3xl mx-auto p-4 border-2 border-ink bg-scroll rounded-lg shadow-lg overflow-y-auto h-96"
