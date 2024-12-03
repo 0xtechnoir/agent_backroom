@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { MongoClient } from 'mongodb';
 
 // MongoDB URI and Database Name
@@ -21,7 +21,7 @@ async function getMongoClient() {
   return client;
 }
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const client = await getMongoClient();
     const db = client.db("virtuals_backroom");
