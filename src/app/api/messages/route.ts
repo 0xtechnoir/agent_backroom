@@ -3,7 +3,6 @@ import { MongoClient } from 'mongodb';
 
 // MongoDB URI and Database Name
 const MONGODB_URI = process.env.MONGODB_URI as string;
-const DATABASE_NAME = 'your_database_name'; // Replace with your database name
 
 // Singleton MongoDB Client
 let client: MongoClient | null = null;
@@ -35,7 +34,6 @@ export async function GET(request: NextRequest) {
     const messagesCollection = db.collection(latestChat.name);
     const messages = await messagesCollection.find().sort({ timestamp: 1 }).toArray();
 
-    console.log('Fetched messages:', messages);
     return NextResponse.json(messages);
   } catch (error) {
     console.error('Error fetching messages:', error);
