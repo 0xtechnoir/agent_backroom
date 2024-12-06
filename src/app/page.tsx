@@ -39,7 +39,7 @@ export default function Home() {
           target="_blank"
           className="cursor-pointer underline"
         >
-          Ben
+          Technoir
         </a>
         ,{" "}
         <a
