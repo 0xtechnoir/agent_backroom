@@ -1,6 +1,6 @@
 'use client';
-
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import io, { Socket } from 'socket.io-client';
 
 interface Message {
   _id: string;
@@ -11,15 +11,81 @@ interface Message {
 
 export default function Home() {
   const [messages, setMessages] = useState<Message[]>([]);
+  const socketRef = useRef<typeof Socket | null>(null);
 
   useEffect(() => {
-    async function fetchMessages() {
-      const res = await fetch('/api/messages');
-      const data = await res.json();
-      setMessages(data);
+    const fetchDocuments = async () => {
+      try {
+        const response = await fetch('/api/messages');
+        const jsonString = await response.json();
+        const data = JSON.parse(jsonString);
+        console.log("data: ", data);
+        setMessages(data.map((doc: any) => ({
+          _id: doc._id,
+          timestamp: doc.timestamp,
+          role: 'user',
+          content: doc.content
+        })));
+      } catch (error) {
+        console.error('Failed to fetch documents:', error);
+      }
+    };
+
+    fetchDocuments();
+
+    // Clean up function to handle component unmount
+    return () => {
+      if (socketRef.current) {
+        socketRef.current.disconnect();
+      }
+    };
+  }, []); // This useEffect only handles fetchDocuments
+
+  // Separate useEffect for socket connection
+  useEffect(() => {
+    const existingSessionId = localStorage.getItem('sessionId');
+    
+    // Only create socket if it doesn't exist
+    if (!socketRef.current) {
+      const socket = io("http://localhost:4000", {
+        auth: {
+          sessionId: existingSessionId
+        },
+        reconnection: true,
+        reconnectionAttempts: 5,
+        reconnectionDelay: 1000,
+        transports: ['websocket']
+      });
+
+      socket.on('connect', () => {
+        console.log('Connected with session ID:', existingSessionId || socket.id);
+        if (!existingSessionId) {
+          localStorage.setItem('sessionId', socket.id);
+        }
+      });
+
+      socket.on('newDocument', (timestamp: string, content: string) => {
+        setMessages(prevMessages => [
+          ...prevMessages,
+          {
+            _id: timestamp,
+            timestamp,
+            role: 'user',
+            content
+          }
+        ]);
+      });
+
+      socketRef.current = socket;
     }
-    fetchMessages();
-  }, []);
+
+    return () => {
+      if (socketRef.current) {
+        socketRef.current.disconnect();
+        socketRef.current = null;
+      }
+    };
+  }, []); // Empty dependency array
 
   useEffect(() => {
     const messageContainer = document.getElementById('message-container');
@@ -27,6 +93,8 @@ export default function Home() {
       messageContainer.scrollTop = messageContainer.scrollHeight;
     }
   }, [messages]);
+
+  
 
   return (
     <main className="min-h-screen bg-parchment text-ink font-medieval p-5">
