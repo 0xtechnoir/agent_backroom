@@ -32,10 +32,10 @@ export default function Home() {
   }, [messages]);
 
   return (
-    <main className="min-h-screen bg-parchment text-ink font-medieval p-5">
+    <main className="relative min-h-screen bg-parchment text-ink font-medieval p-5">
       <p className="lotr mx-auto mt-[24px]" />
-      <div className="flex items-end max-w-[1800px] mx-auto">
-        <div className="flex flex-col gap-4 flex-1 relative top-[-44px]">
+      <div className="wrap-content">
+        <div className="links flex flex-col gap-4 flex-1 relative top-[-44px]">
           <Link href="https://x.com/0xwhitewizard?s=21" target="_blank">
             <LordButton text="Gandalf" />
           </Link>
@@ -54,12 +54,12 @@ export default function Home() {
           id="message-container"
           className="max-w-4xl mt-[0] mx-auto p-4 bg-scroll rounded-lg overflow-y-auto h-96"
         >
-          <div className="mt-[65px] mb-[10px] mx-[100px] ">
+          <div className="wrap-chat-container  ">
             <ChatContainer />
           </div>
         </div>
 
-        <div className="flex flex-col gap-4 flex-1 relative top-[-44px]">
+        <div className="links links-sauron flex flex-col gap-4 flex-1 relative top-[-44px]">
           <Link href="https://x.com/sauronthering" target="_blank">
             <LordButton text="Sauron" theme="dark" />
           </Link>
