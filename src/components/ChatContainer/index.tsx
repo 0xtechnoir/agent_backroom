@@ -1,13 +1,23 @@
 // import { useAtomValue } from "jotai";
 import React, { memo, useEffect, useRef, useState } from "react";
+import io,{ Socket } from "socket.io-client";
 
 // import { sentMessagesDummyAtom } from '~atoms/xKOLProfileAtom'
 
 import LeftMessage from "./LeftMessage";
 import RightMessage from "./RightMessage";
 
+interface Message {
+  _id: string;
+  timestamp: string;
+  role: string;
+  content: string;
+}
+
 const ChatContainer = () => {
-  const [mess, setMess] = useState<string[]>();
+  // const [mess, setMess] = useState<string[]>();
+  const [messages, setMessages] = useState<Message[]>([]);
+  const socketRef = useRef<typeof Socket | null>(null);
 
   const chatContainerRef = useRef<HTMLDivElement>(null);
 
@@ -19,48 +29,103 @@ const ChatContainer = () => {
   };
 
   useEffect(() => {
+    const fetchDocuments = async () => {
+      try {
+        const response = await fetch('/api/messages');
+        const jsonString = await response.json();
+        const data = JSON.parse(jsonString);
+        console.log("data: ", data);
+        setMessages(data.map((doc: any) => ({
+          _id: doc._id,
+          timestamp: JSON.stringify(doc.timestamp),
+          role: JSON.stringify(doc.role),
+          content: JSON.stringify(doc.content)
+        })));
+      } catch (error) {
+        console.error('Failed to fetch documents:', error);
+      }
+    };
+
+    fetchDocuments();
+
+    // Clean up function to handle component unmount
+    return () => {
+      if (socketRef.current) {
+        socketRef.current.disconnect();
+      }
+    };
+  }, []); // This useEffect only handles fetchDocuments
+
+  // Separate useEffect for socket connection
+  useEffect(() => {
+    const existingSessionId = localStorage.getItem('sessionId');
+    
+    // Only create socket if it doesn't exist
+    if (!socketRef.current) {
+      const socket = io("http://localhost:4000", {
+        auth: {
+          sessionId: existingSessionId
+        },
+        reconnection: true,
+        reconnectionAttempts: 5,
+        reconnectionDelay: 1000,
+        transports: ['websocket']
+      });
+
+      socket.on('connect', () => {
+        console.log('Connected with session ID:', existingSessionId || socket.id);
+        if (!existingSessionId) {
+          localStorage.setItem('sessionId', socket.id);
+        }
+      });
+
+      socket.on('newDocument', (timestamp: string, content: string, role: string) => {
+        console.log("newDocument: ", timestamp, content);
+        setMessages(prevMessages => [
+          ...prevMessages,
+          {
+            _id: timestamp,
+            timestamp,
+            role: role,
+            content
+          }
+        ]);
+      });
+
+      socketRef.current = socket;
+    }
+
+    return () => {
+      if (socketRef.current) {
+        socketRef.current.disconnect();
+        socketRef.current = null;
+      }
+    };
+  }, []); // Empty dependency array
+
+  useEffect(() => {
     scrollToBottom();
-  }, [mess]);
+  }, [messages]);
+
 
   return (
     <div
       ref={chatContainerRef}
       className="chat-container min-h-[350px] flex flex-col gap-4 p-4 overflow-y-auto h-[300px]"
     >
-      <LeftMessage
-        messages={[
-          '"Sauron, your arrogance blinds you. It always has. You speak of power as though it were eternal, yet you fail to see that true power lies not in domination, but in unity, in hope. The free peoples of Middle-earth may falter, they may fall, but they will rise again. They always do. And they will rise against you."\n"You have wrought terror and destruction across this land, but do not mistake fear for loyalty. The hearts of men, dwarves, and elves do not belong to you, no matter how many you enslave. Your darkness may cover the skies, but even the smallest spark of light can pierce it."\n"You ask if I can stop you. Perhaps not alone. But I am not alone, Sauron. I stand here as a servant of the Flame Imperishable, and as long as there is life in me, I will oppose you. Not for glory, not for power, but for the simple truth that no one being should wield such dominion over all others. You do not understand this, and that is why you will fall."',
-        ]}
-      />
-      <RightMessage
-        messages={[
-          '"Your words are empty, Gandalf. You cling to fragile ideals—hope, unity, light. They are but fleeting illusions. In the end, all will kneel before me, not out of loyalty, but because there is no alternative. The weak do not choose; they obey."\n"You say you are not alone, but I see no armies behind you, no allies standing at your side. The so-called ‘free peoples’ you defend have abandoned you. Your precious Fellowship is scattered, your warriors broken. You are but a relic of an age long gone, clinging to fading embers of a forgotten fire."\n"This is your last chance, wizard. Swear fealty to me, and I may yet spare you. Together, we could reshape this world. Resist, and I will grind you into dust, as I have done to so many before you. What say you?"',
-        ]}
-      />
-      <LeftMessage
-        messages={[
-          "Certainly! I'd be happy to discuss the latest market trends. What specific aspect are you interested in?",
-          "Save you PK ! 😉",
-        ]}
-      />
-      <RightMessage
-        messages={[
-          "I'm particularly interested in the cryptocurrency market. Have there been any significant developments recently?",
-          "To da moon baby... 🚀",
-        ]}
-      />
-      <LeftMessage
-        messages={[
-          "Yes, there have been several notable developments in the crypto market. For instance, Bitcoin recently...",
-        ]}
-      />
-      <RightMessage
-        messages={[
-          "That's interesting! How do you think this will affect other cryptocurrencies?",
-        ]}
-      />
-
-      {mess && mess.length > 0 && <RightMessage messages={mess} />}
+      {messages.map((msg) => 
+        msg.role === '"Gandalf"' ? (
+          <LeftMessage
+            key={msg._id}
+            messages={[`${JSON.parse(msg.content)}`]}
+          />
+        ) : (
+          <RightMessage
+            key={msg._id} 
+            messages={[`${JSON.parse(msg.content)}`]}
+          />
+        )
+      )}
     </div>
   );
 };

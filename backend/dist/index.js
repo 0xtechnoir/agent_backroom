@@ -48,23 +48,19 @@ function setupChangeStream() {
             if (change.operationType === 'insert' && 'fullDocument' in change) {
                 const content = JSON.stringify(change.fullDocument.content);
                 const timestamp = JSON.stringify(change.fullDocument.timestamp);
+                const role = JSON.stringify(change.fullDocument.role);
                 console.log("fullDocument: ", change.fullDocument);
                 console.log("content: ", content);
                 console.log("timestamp: ", timestamp);
+                console.log("role: ", role);
                 console.log('--------------------------------');
                 if (io) {
-                    io.emit('newDocument', timestamp, content);
+                    io.emit('newDocument', timestamp, content, role);
                 }
             }
             else {
                 console.log("Change event does not have a fullDocument or is not an insert operation:", change);
             }
         });
-    });
-}
-function getAllDocuments() {
-    return __awaiter(this, void 0, void 0, function* () {
-        const chat = yield (0, utilities_1.getLatestChat)();
-        return chat.find().toArray();
     });
 }
