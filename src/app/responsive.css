@@ -112,3 +112,22 @@
   }
 
 }
+
+@media (max-width:377px) {
+  .lotr {
+    height: 98px;
+    width: 237px;
+  }
+
+  #message-container {
+    min-height: 72vh;
+  }
+
+  .wrap-chat-container {
+    height: 72%
+  }
+
+  .chat-container {
+    padding: 16px 12px 24px
+  }
+}
