@@ -48,6 +48,7 @@ const mongodb_1 = require("mongodb");
 let client = null;
 const dotenv = __importStar(require("dotenv"));
 dotenv.config();
+const MONGODB_URI = process.env.MONGODB_URI;
 function getMongoClient() {
     return __awaiter(this, void 0, void 0, function* () {
         if (!client) {

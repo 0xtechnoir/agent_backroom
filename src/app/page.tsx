@@ -22,9 +22,9 @@ export default function Home() {
         console.log("data: ", data);
         setMessages(data.map((doc: any) => ({
           _id: doc._id,
-          timestamp: doc.timestamp,
+          timestamp: JSON.stringify(doc.timestamp),
           role: 'user',
-          content: doc.content
+          content: JSON.stringify(doc.content)
         })));
       } catch (error) {
         console.error('Failed to fetch documents:', error);
@@ -65,6 +65,7 @@ export default function Home() {
       });
 
       socket.on('newDocument', (timestamp: string, content: string) => {
+        console.log("newDocument: ", timestamp, content);
         setMessages(prevMessages => [
           ...prevMessages,
           {
@@ -105,7 +106,7 @@ export default function Home() {
       >
         {messages.map((msg) => (
           <p key={msg._id} className="mb-2">
-            <strong>{new Date(msg.timestamp).toLocaleString()}:</strong> {msg.content}
+            <strong>{new Date(JSON.parse(msg.timestamp)).toLocaleString()}:</strong> {JSON.parse(msg.content)}
           </p>
         ))}
       </div>
