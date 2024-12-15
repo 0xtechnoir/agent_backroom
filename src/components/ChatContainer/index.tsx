@@ -106,7 +106,7 @@ const ChatContainer = () => {
   return (
     <div
       ref={chatContainerRef}
-      className="chat-container min-h-[350px] flex flex-col gap-4 p-4 overflow-y-auto h-[300px]"
+      className="chat-container"
     >
       {messages.map((msg) => 
         msg.role === '"Gandalf"' ? (
