@@ -31,7 +31,7 @@ const ChatContainer = () => {
         const response = await fetch('/api/messages');
         const jsonString = await response.json();
         const data = JSON.parse(jsonString);
-        setMessages(data.map((doc: any) => ({
+        setMessages(data.map((doc: Message) => ({
           _id: doc._id,
           timestamp: JSON.stringify(doc.timestamp),
           role: JSON.stringify(doc.role),

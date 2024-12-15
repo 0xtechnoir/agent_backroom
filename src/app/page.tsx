@@ -43,7 +43,7 @@ export default function Home() {
           >
             <LordButton text="Dexscreener" theme="dark" />
           </Link>
-          <Link href="https://app.virtuals.io/virtuals/10895" target="_blank">
+          <Link href="https://app.virtuals.io/virtuals/10109" target="_blank">
             <LordButton text="Virtual" theme="dark" />
           </Link>
         </div>

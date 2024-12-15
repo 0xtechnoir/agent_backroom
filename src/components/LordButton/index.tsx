@@ -1,11 +1,13 @@
 interface ILordButton {
   text: string;
   theme?: string;
-  onClick?: (value?: any) => void;
+  onClick?: () => void;
 }
 const LordButton = ({ text, theme, onClick }: ILordButton) => {
   const handleOnClick = () => {
-    onClick && onClick();
+    if (onClick) {
+      onClick();
+    }
   };
 
   return (
