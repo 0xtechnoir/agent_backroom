@@ -38,18 +38,12 @@ io.on('connection', (socket) => {
 
 async function setupChangeStream() {
   const chat = await getLatestChat();
-  // console.log("chat: ", chat);
   const changeStream = chat.watch();
   changeStream.on('change', (change: ChangeStreamDocument<any>) => {
     if (change.operationType === 'insert' && 'fullDocument' in change) {
       const content = JSON.stringify(change.fullDocument.content);
       const timestamp = JSON.stringify(change.fullDocument.timestamp);
       const role = JSON.stringify(change.fullDocument.role);
-      console.log("fullDocument: ", change.fullDocument);
-      console.log("content: ", content);
-      console.log("timestamp: ", timestamp);
-      console.log("role: ", role);
-      console.log('--------------------------------');
       if (io) {
         io.emit('newDocument', timestamp, content, role);
       }
