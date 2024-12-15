@@ -10,7 +10,6 @@ let client: MongoClient | null = null;
 async function getMongoClient() {
   if (!client) {
     try {
-      console.log("MONGODB_URI: ", MONGODB_URI);
       client = new MongoClient(MONGODB_URI as string);
       await client.connect();
       console.log('Connected to MongoDB');

@@ -2,8 +2,6 @@
 import React, { memo, useEffect, useRef, useState } from "react";
 import io,{ Socket } from "socket.io-client";
 
-// import { sentMessagesDummyAtom } from '~atoms/xKOLProfileAtom'
-
 import LeftMessage from "./LeftMessage";
 import RightMessage from "./RightMessage";
 
@@ -15,7 +13,6 @@ interface Message {
 }
 
 const ChatContainer = () => {
-  // const [mess, setMess] = useState<string[]>();
   const [messages, setMessages] = useState<Message[]>([]);
   const socketRef = useRef<typeof Socket | null>(null);
 
@@ -34,7 +31,6 @@ const ChatContainer = () => {
         const response = await fetch('/api/messages');
         const jsonString = await response.json();
         const data = JSON.parse(jsonString);
-        console.log("data: ", data);
         setMessages(data.map((doc: any) => ({
           _id: doc._id,
           timestamp: JSON.stringify(doc.timestamp),
@@ -80,7 +76,6 @@ const ChatContainer = () => {
       });
 
       socket.on('newDocument', (timestamp: string, content: string, role: string) => {
-        console.log("newDocument: ", timestamp, content);
         setMessages(prevMessages => [
           ...prevMessages,
           {
