@@ -1,9 +1,8 @@
-import express, {Request, Response} from 'express';
 import {Server} from 'socket.io';
-
-const {createServer} = require('http');
-import {getDatabaseVitualsBackroom, getLatestChat} from './utilities';
+import {getDatabaseVitualsBackroom} from './utilities';
 import {ChangeStreamDocument} from 'mongodb';
+import {createServer} from "http";
+
 
 const server = createServer()
 const io = new Server(server, {
